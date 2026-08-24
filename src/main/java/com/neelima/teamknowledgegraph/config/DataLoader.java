@@ -14,7 +14,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         try {
-            String query = "MERGE (s:Skill {name: 'Java'}) RETURN s";
+            String query = "UNWIND ['Java','Python','React','Angular','Node.js','Spring Boot','Docker','Kubernetes','AWS','SQL','MongoDB','JavaScript','TypeScript','HTML','CSS','Git','Jenkins','Microservices','REST API','GraphQL','Neo4j','MySQL','PostgreSQL','C++','C#','DevOps','Machine Learning','Data Structures','Algorithms','System Design'] AS skillName MERGE (s:Skill {name: skillName}) RETURN count(s)";
             neo4jClient.query(query).run();
             System.out.println("=== SEED SCRIPT EXECUTED SUCCESSFULLY ===");
         } catch (Exception e) {
