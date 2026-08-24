@@ -24,6 +24,6 @@ public interface TaskRepository extends Neo4jRepository<Task, String> {
     @Query("MATCH (t:Task {id: $taskId})-[:DEPENDS_ON*1..5]->(blocker:Task) RETURN DISTINCT blocker")
     List<Task> findAllBlockers(@Param("taskId") String taskId);
 
-    @Query("MATCH (t:Task {id: $taskId}), (s:Skill {name: $skillName}) MERGE (t)-[:REQUIRES]->(s) RETURN t")
-    Task addSkillToTask(@Param("taskId") String taskId, @Param("skillName") String skillName);
+    @Query("MATCH (t:Task {id: $taskId}), (s:Skill {id: $skillId}) MERGE (t)-[:REQUIRES]->(s) RETURN t")
+    Task addSkillToTask(@Param("taskId") String taskId, @Param("skillId") String skillId);
 }

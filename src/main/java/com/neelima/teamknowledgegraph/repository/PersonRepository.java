@@ -13,19 +13,14 @@ public interface PersonRepository extends Neo4jRepository<Person, String> {
                          @Param("role") String role, @Param("email") String email);
     
     @Query("MATCH (p:Person {id: $personId}), (proj:Project {id: $projectId}) " +
-            "MERGE (p)-[:WORKS_ON]->(proj) " +
-            "RETURN count(*)")
+            "MERGE (p)-[:WORKS_ON]->(proj)")
      void assignToProject(@Param("personId") String personId, @Param("projectId") String projectId);
     
     @Query("MATCH (p:Person {id: $personId}), (t:Task {id: $taskId}) " +
-    	       "MERGE (p)-[:ASSIGNED_TO]->(t) " +
-    	       "RETURN count(*)")
+    	       "MERGE (p)-[:ASSIGNED_TO]->(t)")
     	void assignToTask(@Param("personId") String personId, @Param("taskId") String taskId);
 
     @Query("MATCH (p:Person {id: $personId}), (s:Skill {id: $skillId}) " +
-    	       "MERGE (p)-[:HAS_SKILL]->(s) " +
-    	       "RETURN count(*)")
+    	       "MERGE (p)-[:HAS_SKILL]->(s)")
     	void addSkillToPerson(@Param("personId") String personId, @Param("skillId") String skillId);
-
-
 }

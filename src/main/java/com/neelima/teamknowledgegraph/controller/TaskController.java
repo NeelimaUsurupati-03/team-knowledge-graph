@@ -71,9 +71,8 @@ public class TaskController {
 	    return taskService.findAllBlockers(taskId);
 	}
 	
-	@PostMapping("addSkill/{taskId}/{skillName}")
-	public void addSkill(@PathVariable String taskId, @PathVariable String skillName) {
-	    taskRepo.addSkillToTask(taskId, skillName);
+	@PostMapping("addSkill/{taskId}/{skillId}")
+	public void addSkill(@PathVariable String taskId, @PathVariable String skillId) {
+	    taskRepo.addSkillToTask(taskId, skillId);
 	}
-
 }

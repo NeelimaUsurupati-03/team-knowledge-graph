@@ -33,4 +33,7 @@ public class Task {
 	@Relationship(type = "DEPENDS_ON", direction = Relationship.Direction.OUTGOING)
 	private List<Task> dependsOn = new ArrayList<>();
 
+	@Relationship(type = "REQUIRES", direction = Relationship.Direction.OUTGOING)
+	private List<Skill> requiredSkills = new ArrayList<>();
+
 }
