@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.neelima.teamknowledgegraph.model.Person;
 import com.neelima.teamknowledgegraph.model.Task;
+import com.neelima.teamknowledgegraph.repository.TaskRepository;
 import com.neelima.teamknowledgegraph.service.TaskService;
 
 @RestController
@@ -22,6 +23,9 @@ public class TaskController {
 	
 	@Autowired
 	private TaskService taskService;
+	
+	@Autowired
+	private TaskRepository taskRepo;
 	
 	@GetMapping("getAllTasks")
 	public List<Task> getAllTasks()
@@ -65,6 +69,11 @@ public class TaskController {
 	@GetMapping("blockers/{taskId}")
 	public List<Task> blockers(@PathVariable String taskId) {
 	    return taskService.findAllBlockers(taskId);
+	}
+	
+	@PostMapping("addSkill/{taskId}/{skillName}")
+	public void addSkill(@PathVariable String taskId, @PathVariable String skillName) {
+	    taskRepo.addSkillToTask(taskId, skillName);
 	}
 
 }
