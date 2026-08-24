@@ -4,408 +4,161 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Team Knowledge Graph</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --navy: #0F1225;
-    --navy-light: #1A1E3A;
-    --navy-lighter: #262B52;
-    --teal: #14B88A;
-    --teal-dim: #0F6E56;
-    --teal-glow: rgba(20,184,138,0.15);
-    --coral: #FF6B4A;
-    --coral-glow: rgba(255,107,74,0.15);
-    --purple: #8B7FF0;
-    --purple-glow: rgba(139,127,240,0.15);
-    --bg: #F7F8FA;
-    --text: #14162B;
-    --text-muted: #767B94;
-    --border: #E8E9F0;
-    --card: #ffffff;
-  }
-  body { font-family: 'Manrope', Arial, sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
-  .mono { font-family: 'JetBrains Mono', monospace; }
-
-  .layout { display: flex; min-height: 100vh; }
-
-  aside {
-    width: 232px; background: var(--navy); color: #ccc; padding: 28px 16px;
-    display: flex; flex-direction: column; gap: 4px; flex-shrink: 0;
-    background-image: radial-gradient(circle at 20% 0%, var(--navy-light) 0%, var(--navy) 60%);
-  }
-  aside .brand {
-    color: white; font-size: 18px; font-weight: 800; margin-bottom: 32px; padding: 0 10px;
-    display: flex; align-items: center; gap: 8px; letter-spacing: -0.02em;
-  }
-  aside .brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 12px var(--teal); flex-shrink: 0; }
-  aside a {
-    color: #9498b0; text-decoration: none; padding: 11px 14px; border-radius: 8px;
-    font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 10px;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
-  }
-  aside a:hover { background: var(--navy-lighter); color: white; transform: translateX(2px); }
-  aside a.active { background: var(--teal); color: var(--navy); font-weight: 700; }
-  aside a .icon { width: 16px; text-align: center; font-size: 13px; opacity: 0.9; }
-
-  main { flex: 1; padding: 36px 44px; max-width: 1040px; }
-  .page-enter { animation: fadeUp 0.4s ease both; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-  h2 { font-size: 24px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.02em; }
-  .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 26px; }
-
-  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
-  .stat {
-    background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px;
-    position: relative; overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .stat:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -12px rgba(20,22,43,0.15); }
-  .stat::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-  }
-  .stat.teal::before { background: var(--teal); }
-  .stat.coral::before { background: var(--coral); }
-  .stat.purple::before { background: var(--purple); }
-  .stat .num { font-size: 34px; font-weight: 800; letter-spacing: -0.03em; }
-  .stat .label { font-size: 13px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
-  .stat.teal .num { color: var(--teal-dim); }
-  .stat.coral .num { color: var(--coral); }
-  .stat.purple .num { color: var(--purple); }
-
-  form.inline {
-    display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px;
-    background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px;
-  }
-  form.inline input {
-    flex: 1; min-width: 140px; padding: 10px 14px; border-radius: 8px; border: 1.5px solid var(--border);
-    font-size: 14px; outline: none; font-family: 'Manrope', sans-serif; transition: border-color 0.15s ease;
-  }
-  form.inline input:focus { border-color: var(--teal); }
-  form.inline button {
-    padding: 10px 20px; border-radius: 8px; border: none; background: var(--navy);
-    color: white; font-size: 14px; cursor: pointer; font-weight: 600;
-    transition: background 0.15s ease, transform 0.1s ease;
-  }
-  form.inline button:hover { background: var(--teal-dim); }
-  form.inline button:active { transform: scale(0.97); }
-
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
-  .card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px;
-    position: relative; animation: fadeUp 0.35s ease both;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  }
-  .card:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -14px rgba(20,22,43,0.2); border-color: var(--teal); }
-  .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 5px; }
-  .card p.meta { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
-  .card .id { font-size: 10px; color: #c3c5d3; font-family: 'JetBrains Mono', monospace; word-break: break-all; }
-  .badge {
-    display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-  .badge.teal { background: var(--teal-glow); color: var(--teal-dim); }
-  .badge.coral { background: var(--coral-glow); color: var(--coral); }
-  .badge.purple { background: var(--purple-glow); color: var(--purple); }
-
-  .section { display: none; }
-  .section.active { display: block; }
-
-  .empty { color: var(--text-muted); text-align: center; padding: 48px 20px; font-size: 14px; }
-  .empty::before { content: '◇'; display: block; font-size: 22px; margin-bottom: 8px; color: #d5d7e2; }
-
-  .spinner-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 48px 20px; color: var(--text-muted); font-size: 13px; }
-  .spinner {
-    width: 28px; height: 28px; border-radius: 50%;
-    border: 3px solid var(--border); border-top-color: var(--teal);
-    animation: spin 0.7s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .explore-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 20px; }
-  .explore-box .result-block { margin-top: 18px; animation: fadeUp 0.3s ease both; }
-  .explore-box .result-block h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 10px; font-weight: 700; }
-  .person-chip, .task-chip {
-    display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 20px;
-    font-size: 13px; font-weight: 600; margin: 3px 6px 3px 0; animation: fadeUp 0.3s ease both;
-  }
-  .person-chip { background: var(--teal-glow); color: var(--teal-dim); }
-  .task-chip { background: var(--coral-glow); color: var(--coral); }
-  .person-chip::before { content: '●'; font-size: 8px; }
-  .task-chip::before { content: '▲'; font-size: 8px; }
-
-  ::-webkit-scrollbar { width: 8px; }
-  ::-webkit-scrollbar-thumb { background: #d5d7e2; border-radius: 4px; }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0F1225;--navy-light:#1A1E3A;--navy-lighter:#262B52;--teal:#14B88A;--teal-dim:#0F6E56;--teal-glow:rgba(20,184,138,0.15);--coral:#FF6B4A;--coral-glow:rgba(255,107,74,0.15);--purple:#8B7FF0;--purple-glow:rgba(139,127,240,0.15);--bg:#F7F8FA;--text:#14162B;--text-muted:#767B94;--border:#E8E9F0;--card:#ffffff}
+body{font-family:'Manrope',Arial,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+.layout{display:flex;min-height:100vh}
+aside{width:232px;background:var(--navy);color:#ccc;padding:28px 16px;display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+aside .brand{color:white;font-size:18px;font-weight:800;margin-bottom:32px;padding:0 10px;display:flex;align-items:center;gap:8px}
+aside .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal);flex-shrink:0}
+aside a{color:#9498b0;text-decoration:none;padding:11px 14px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:10px}
+aside a:hover{background:var(--navy-lighter);color:white}
+aside a.active{background:var(--teal);color:var(--navy);font-weight:700}
+main{flex:1;padding:36px 44px;max-width:1040px}
+h2{font-size:24px;font-weight:800;margin-bottom:4px}
+.subtitle{color:var(--text-muted);font-size:14px;margin-bottom:26px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
+.stat.teal::before{background:var(--teal)}.stat.coral::before{background:var(--coral)}.stat.purple::before{background:var(--purple)}
+.stat .num{font-size:34px;font-weight:800}.stat .label{font-size:13px;color:var(--text-muted);margin-top:3px}
+.stat.teal .num{color:var(--teal-dim)}.stat.coral .num{color:var(--coral)}.stat.purple .num{color:var(--purple)}
+form.inline{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+form.inline input{flex:1;min-width:140px;padding:10px 14px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;outline:none}
+form.inline button{padding:10px 20px;border-radius:8px;border:none;background:var(--navy);color:white;font-size:14px;cursor:pointer;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;animation:fadeUp 0.35s ease both}
+.card h3{font-size:15px;font-weight:700;margin-bottom:5px}
+.card p.meta{font-size:13px;color:var(--text-muted);margin-bottom:10px}
+.card .id{font-size:10px;color:#c3c5d3;font-family:'JetBrains Mono',monospace;word-break:break-all}
+.badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700}
+.badge.teal{background:var(--teal-glow);color:var(--teal-dim)}.badge.coral{background:var(--coral-glow);color:var(--coral)}.badge.purple{background:var(--purple-glow);color:var(--purple)}
+.section{display:none}.section.active{display:block}
+.empty{color:var(--text-muted);text-align:center;padding:48px 20px;font-size:14px}
+.spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:48px 20px;color:var(--text-muted);font-size:13px}
+.spinner{width:28px;height:28px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--teal);animation:spin 0.7s linear infinite}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.explore-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:20px}
+.explore-box .result-block{margin-top:18px}
+.explore-box .result-block h4{font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:10px;font-weight:700}
+.person-chip,.task-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;margin:3px 6px 3px 0}
+.person-chip{background:var(--teal-glow);color:var(--teal-dim)}.task-chip{background:var(--coral-glow);color:var(--coral)}
 </style>
 </head>
 <body>
-
 <div class="layout">
-  <aside>
-    <div class="brand"><span class="dot"></span>Team<span style="color:var(--teal)">Graph</span></div>
-    <a onclick="showSection('dashboard')" class="active" id="nav-dashboard"><span class="icon">◈</span>Dashboard</a>
-    <a onclick="showSection('people')" id="nav-people"><span class="icon">◐</span>People</a>
-    <a onclick="showSection('projects')" id="nav-projects"><span class="icon">◧</span>Projects</a>
-    <a onclick="showSection('tasks')" id="nav-tasks"><span class="icon">◫</span>Tasks</a>
-    <a onclick="showSection('skills')" id="nav-skills"><span class="icon">◆</span>Skills</a>
-    <a onclick="showSection('explore')" id="nav-explore"><span class="icon">⟡</span>Explore graph</a>
-  </aside>
-
-  <main>
-
-    <div class="section active" id="dashboard">
-      <div class="page-enter">
-      <h2>Dashboard</h2>
-      <p class="subtitle">Overview of your team's knowledge graph</p>
-      <div id="dashboard-content"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div>
-      </div>
-    </div>
-
-    <div class="section" id="people">
-      <div class="page-enter">
-      <h2>People</h2>
-      <p class="subtitle">Team members and their roles</p>
-      <form class="inline" onsubmit="addPerson(event)">
-        <input id="p-name" placeholder="Name" required>
-        <input id="p-role" placeholder="Role" required>
-        <input id="p-email" placeholder="Email" required>
-        <button type="submit">Add person</button>
-      </form>
-      <div id="people-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div>
-      </div>
-    </div>
-
-    <div class="section" id="projects">
-      <div class="page-enter">
-      <h2>Projects</h2>
-      <p class="subtitle">Active and past initiatives</p>
-      <form class="inline" onsubmit="addProject(event)">
-        <input id="pr-name" placeholder="Name" required>
-        <input id="pr-desc" placeholder="Description" required>
-        <input id="pr-status" placeholder="Status" required>
-        <button type="submit">Add project</button>
-      </form>
-      <div id="projects-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div>
-      </div>
-    </div>
-
-    <div class="section" id="tasks">
-      <div class="page-enter">
-      <h2>Tasks</h2>
-      <p class="subtitle">Work items across all projects</p>
-      <form class="inline" onsubmit="addTask(event)">
-        <input id="t-title" placeholder="Title" required>
-        <input id="t-status" placeholder="Status" required>
-        <input id="t-priority" placeholder="Priority" required>
-        <button type="submit">Add task</button>
-      </form>
-      <div id="tasks-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div>
-      </div>
-    </div>
-
-    <div class="section" id="skills">
-      <div class="page-enter">
-      <h2>Skills</h2>
-      <p class="subtitle">Capabilities across the team</p>
-      <form class="inline" onsubmit="addSkill(event)">
-        <input id="s-name" placeholder="Skill name" required>
-        <button type="submit">Add skill</button>
-      </form>
-      <div id="skills-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div>
-      </div>
-    </div>
-
-    <div class="section" id="explore">
-      <div class="page-enter">
-      <h2>Explore graph</h2>
-      <p class="subtitle">See who can help with a task, and what's blocking it</p>
-      <div class="explore-box">
-        <form class="inline" style="margin-bottom:0" onsubmit="exploreTask(event)">
-          <input id="ex-taskid" placeholder="Paste a Task ID" required>
-          <button type="submit">Explore</button>
-        </form>
-        <div id="explore-results"></div>
-      </div>
-      </div>
-    </div>
-
-  </main>
+<aside>
+<div class="brand"><span class="dot"></span>Team<span style="color:var(--teal)">Graph</span></div>
+<a onclick="showSection('dashboard')" class="active" id="nav-dashboard">◈ Dashboard</a>
+<a onclick="showSection('people')" id="nav-people">◐ People</a>
+<a onclick="showSection('projects')" id="nav-projects">◧ Projects</a>
+<a onclick="showSection('tasks')" id="nav-tasks">◫ Tasks</a>
+<a onclick="showSection('skills')" id="nav-skills">◆ Skills</a>
+<a onclick="showSection('explore')" id="nav-explore">⟡ Explore graph</a>
+</aside>
+<main>
+<div class="section active" id="dashboard"><h2>Dashboard</h2><p class="subtitle">Overview of your team's knowledge graph</p><div id="dashboard-content"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div></div>
+<div class="section" id="people"><h2>People</h2><p class="subtitle">Team members and their roles</p><form class="inline" onsubmit="addPerson(event)"><input id="p-name" placeholder="Name" required><input id="p-role" placeholder="Role" required><input id="p-email" placeholder="Email" required><button type="submit">Add person</button></form><div id="people-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div></div>
+<div class="section" id="projects"><h2>Projects</h2><p class="subtitle">Active and past initiatives</p><form class="inline" onsubmit="addProject(event)"><input id="pr-name" placeholder="Name" required><input id="pr-desc" placeholder="Description" required><input id="pr-status" placeholder="Status" required><button type="submit">Add project</button></form><div id="projects-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div></div>
+<div class="section" id="tasks"><h2>Tasks</h2><p class="subtitle">Work items across all projects</p><form class="inline" onsubmit="addTask(event)"><input id="t-title" placeholder="Title" required><input id="t-status" placeholder="Status" required><input id="t-priority" placeholder="Priority" required><button type="submit">Add task</button></form><div id="tasks-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div></div>
+<div class="section" id="skills"><h2>Skills</h2><p class="subtitle">Capabilities across the team</p><form class="inline" onsubmit="addSkill(event)"><input id="s-name" placeholder="Skill name" required><button type="submit">Add skill</button></form><div id="skills-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div></div>
+<div class="section" id="explore"><h2>Explore graph</h2><p class="subtitle">See who can help with a task</p><div class="explore-box"><form class="inline" style="margin-bottom:0" onsubmit="exploreTask(event)"><input id="ex-taskid" placeholder="Paste a Task ID" required><button type="submit">Explore</button></form><div id="explore-results"></div></div></div>
+</main>
 </div>
-
 <script>
-const API = '/api';
-
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('aside a').forEach(a => a.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.getElementById('nav-' + id).classList.add('active');
-  if (id === 'dashboard') loadDashboard();
-  if (id === 'people') loadPeople();
-  if (id === 'projects') loadProjects();
-  if (id === 'tasks') loadTasks();
-  if (id === 'skills') loadSkills();
+const API='/api';
+function showSection(id){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.querySelectorAll('aside a').forEach(a=>a.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.getElementById('nav-'+id).classList.add('active');
+if(id==='dashboard')loadDashboard();
+if(id==='people')loadPeople();
+if(id==='projects')loadProjects();
+if(id==='tasks')loadTasks();
+if(id==='skills')loadSkills();
 }
-
-async function loadDashboard() {
-  const el = document.getElementById('dashboard-content');
-  try {
-    const [people, projects, tasks] = await Promise.all([
-      fetch(API + '/persons/getAll').then(r => r.json()),
-      fetch(API + '/projects/getAllProject').then(r => r.json()),
-      fetch(API + '/task/getAllTasks').then(r => r.json())
-    ]);
-    el.innerHTML = `
-      <div class="stat-row">
-        <div class="stat teal"><div class="num">${people.length}</div><div class="label">People</div></div>
-        <div class="stat coral"><div class="num">${projects.length}</div><div class="label">Projects</div></div>
-        <div class="stat purple"><div class="num">${tasks.length}</div><div class="label">Tasks</div></div>
-      </div>
-    `;
-  } catch (e) {
-    el.innerHTML = '<div class="empty">Could not reach the backend. Make sure Spring Boot is running on port 8080.</div>';
-  }
+async function loadDashboard(){
+const el=document.getElementById('dashboard-content');
+try{
+const [people,projects,tasks]=await Promise.all([fetch(API+'/persons/getAll').then(r=>r.json()),fetch(API+'/projects/getAllProject').then(r=>r.json()),fetch(API+'/task/getAllTasks').then(r=>r.json())]);
+el.innerHTML=`<div class="stat-row"><div class="stat teal"><div class="num">${people.length}</div><div class="label">People</div></div><div class="stat coral"><div class="num">${projects.length}</div><div class="label">Projects</div></div><div class="stat purple"><div class="num">${tasks.length}</div><div class="label">Tasks</div></div></div>`;
+}catch(e){el.innerHTML='<div class="empty">Could not reach backend. Refresh page.</div>';}
 }
-
-async function loadPeople() {
-  const el = document.getElementById('people-list');
-  el.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
-  try {
-    const res = await fetch(API + '/persons/getAll');
-    const data = await res.json();
-    if (data.length === 0) { el.innerHTML = '<div class="empty">No people yet. Add your first team member above.</div>'; return; }
-    el.innerHTML = data.map((p, i) => `
-      <div class="card" style="animation-delay:${i * 0.04}s">
-        <h3>${p.name}</h3>
-        <p class="meta">${p.role} · ${p.email}</p>
-        <div class="id">${p.id}</div>
-      </div>
-    `).join('');
-  } catch (e) { el.innerHTML = '<div class="empty">Error loading people.</div>'; }
+async function loadPeople(){
+const el=document.getElementById('people-list');
+el.innerHTML='<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
+try{
+const res=await fetch(API+'/persons/getAll');const data=await res.json();
+if(data.length===0){el.innerHTML='<div class="empty">No people yet.</div>';return;}
+el.innerHTML=data.map(p=>`<div class="card"><h3>${p.name}</h3><p class="meta">${p.role} · ${p.email}</p></div>`).join('');
+}catch(e){el.innerHTML='<div class="empty">Error loading people.</div>';}
 }
-
-async function addPerson(e) {
-  e.preventDefault();
-  const body = {
-    name: document.getElementById('p-name').value,
-    role: document.getElementById('p-role').value,
-    email: document.getElementById('p-email').value
-  };
-  await fetch(API + '/persons/addPerson', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
-  e.target.reset();
-  loadPeople();
+async function addPerson(e){
+e.preventDefault();
+const body={name:document.getElementById('p-name').value,role:document.getElementById('p-role').value,email:document.getElementById('p-email').value};
+await fetch(API+'/persons/addPerson',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+e.target.reset();loadPeople();
 }
-
-async function loadProjects() {
-  const el = document.getElementById('projects-list');
-  el.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
-  try {
-    const res = await fetch(API + '/projects/getAllProject');
-    const data = await res.json();
-    if (data.length === 0) { el.innerHTML = '<div class="empty">No projects yet.</div>'; return; }
-    el.innerHTML = data.map((p, i) => `
-      <div class="card" style="animation-delay:${i * 0.04}s">
-        <h3>${p.name}</h3>
-        <p class="meta">${p.description}</p>
-        <span class="badge coral">${p.status}</span>
-        <div class="id" style="margin-top:10px">${p.id}</div>
-      </div>
-    `).join('');
-  } catch (e) { el.innerHTML = '<div class="empty">Error loading projects.</div>'; }
+async function loadProjects(){
+const el=document.getElementById('projects-list');
+el.innerHTML='<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
+try{
+const res=await fetch(API+'/projects/getAllProject');const data=await res.json();
+if(data.length===0){el.innerHTML='<div class="empty">No projects yet.</div>';return;}
+el.innerHTML=data.map(p=>`<div class="card"><h3>${p.name}</h3><p class="meta">${p.description||''}</p><span class="badge coral">${p.status||'Active'}</span></div>`).join('');
+}catch(e){el.innerHTML='<div class="empty">Error loading projects.</div>';}
 }
-
-async function addProject(e) {
-  e.preventDefault();
-  const body = {
-    name: document.getElementById('pr-name').value,
-    description: document.getElementById('pr-desc').value,
-    status: document.getElementById('pr-status').value
-  };
-  await fetch(API + '/projects/addProject', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
-  e.target.reset();
-  loadProjects();
+async function addProject(e){
+e.preventDefault();
+const body={name:document.getElementById('pr-name').value,description:document.getElementById('pr-desc').value,status:document.getElementById('pr-status').value};
+await fetch(API+'/projects/addProject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+e.target.reset();loadProjects();
 }
-
-async function loadTasks() {
-  const el = document.getElementById('tasks-list');
-  el.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
-  try {
-    const res = await fetch(API + '/task/getAllTasks');
-    const data = await res.json();
-    if (data.length === 0) { el.innerHTML = '<div class="empty">No tasks yet.</div>'; return; }
-    el.innerHTML = data.map((t, i) => `
-      <div class="card" style="animation-delay:${i * 0.04}s">
-        <h3>${t.title}</h3>
-        <p class="meta">Priority: ${t.priority}</p>
-        <span class="badge purple">${t.status}</span>
-        <div class="id" style="margin-top:10px">${t.id}</div>
-      </div>
-    `).join('');
-  } catch (e) { el.innerHTML = '<div class="empty">Error loading tasks.</div>'; }
+async function loadTasks(){
+const el=document.getElementById('tasks-list');
+el.innerHTML='<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
+try{
+const res=await fetch(API+'/task/getAllTasks');const data=await res.json();
+if(data.length===0){el.innerHTML='<div class="empty">No tasks yet.</div>';return;}
+el.innerHTML=data.map(t=>`<div class="card"><h3>${t.title}</h3><p class="meta">Priority: ${t.priority||'Normal'}</p><span class="badge purple">${t.status||'Open'}</span><div class="id" style="margin-top:10px">${t.id}</div></div>`).join('');
+}catch(e){el.innerHTML='<div class="empty">Error loading tasks.</div>';}
 }
-
-async function addTask(e) {
-  e.preventDefault();
-  const body = {
-    title: document.getElementById('t-title').value,
-    status: document.getElementById('t-status').value,
-    priority: document.getElementById('t-priority').value
-  };
-  await fetch(API + '/task/addTask', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
-  e.target.reset();
-  loadTasks();
+async function addTask(e){
+e.preventDefault();
+const body={title:document.getElementById('t-title').value,status:document.getElementById('t-status').value,priority:document.getElementById('t-priority').value};
+await fetch(API+'/task/addTask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+e.target.reset();loadTasks();
 }
-
-async function loadSkills() {
-  const el = document.getElementById('skills-list');
-  el.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
-  try {
-    const res = await fetch(API + '/skill/getAll');
-    const data = await res.json();
-    if (data.length === 0) { el.innerHTML = '<div class="empty">No skills yet.</div>'; return; }
-    el.innerHTML = data.map((s, i) => `
-      <div class="card" style="animation-delay:${i * 0.04}s">
-        <h3>${s.name}</h3>
-        <div class="id">${s.id}</div>
-      </div>
-    `).join('');
-  } catch (e) { el.innerHTML = '<div class="empty">Error loading skills.</div>'; }
+async function loadSkills(){
+const el=document.getElementById('skills-list');
+el.innerHTML='<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
+try{
+const res=await fetch(API+'/skill/getAll');const data=await res.json();
+if(data.length===0){el.innerHTML='<div class="empty">No skills yet.</div>';return;}
+el.innerHTML=data.map(s=>`<div class="card"><h3>${s.name}</h3><span class="badge teal">Skill</span></div>`).join('');
+}catch(e){el.innerHTML='<div class="empty">Error loading skills.</div>';}
 }
-
-async function addSkill(e) {
-  e.preventDefault();
-  const body = { name: document.getElementById('s-name').value };
-  await fetch(API + '/skill/addSkill', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
-  e.target.reset();
-  loadSkills();
+async function addSkill(e){
+e.preventDefault();
+const body={name:document.getElementById('s-name').value};
+await fetch(API+'/skill/addSkill',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+e.target.reset();loadSkills();
 }
-
-async function exploreTask(e) {
-  e.preventDefault();
-  const taskId = document.getElementById('ex-taskid').value;
-  const el = document.getElementById('explore-results');
-  el.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div>Searching the graph</div>';
-  try {
-    const [helpers, blockers] = await Promise.all([
-      fetch(API + '/task/whoCanHelp/' + taskId).then(r => r.json()),
-      fetch(API + '/task/blockers/' + taskId).then(r => r.json())
-    ]);
-    el.innerHTML = `
-      <div class="result-block">
-        <h4>Who can help</h4>
-        ${helpers.length ? helpers.map(p => `<span class="person-chip">${p.name} · ${p.role}</span>`).join('') : '<span class="empty" style="padding:0">No one found</span>'}
-      </div>
-      <div class="result-block">
-        <h4>Blocked by</h4>
-        ${blockers.length ? blockers.map(t => `<span class="task-chip">${t.title}</span>`).join('') : '<span class="empty" style="padding:0">No blockers</span>'}
-      </div>
-    `;
-  } catch (e) { el.innerHTML = '<div class="empty">Error running query. Check the Task ID.</div>'; }
+async function exploreTask(e){
+e.preventDefault();
+const taskId=document.getElementById('ex-taskid').value;
+const el=document.getElementById('explore-results');
+el.innerHTML='<div class="spinner-wrap"><div class="spinner"></div>Searching</div>';
+try{
+const [helpers,blockers]=await Promise.all([fetch(API+'/task/whoCanHelp/'+taskId).then(r=>r.json()),fetch(API+'/task/blockers/'+taskId).then(r=>r.json())]);
+el.innerHTML=`<div class="result-block"><h4>Who can help</h4>${helpers.length?helpers.map(p=>`<span class="person-chip">${p.name} · ${p.role}</span>`).join(''):'<span class="empty">No one found</span>'}</div><div class="result-block"><h4>Blocked by</h4>${blockers.length?blockers.map(t=>`<span class="task-chip">${t.title}</span>`).join(''):'<span class="empty">No blockers</span>'}</div>`;
+}catch(e){el.innerHTML='<div class="empty">Error. Check Task ID.</div>';}
 }
-
 loadDashboard();
 </script>
-
 </body>
 </html>
