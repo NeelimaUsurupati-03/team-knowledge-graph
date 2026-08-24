@@ -26,26 +26,29 @@ h2{font-size:24px;font-weight:800;margin-bottom:4px}
 .stat .num{font-size:34px;font-weight:800}.stat .label{font-size:13px;color:var(--text-muted);margin-top:3px}
 .stat.teal .num{color:var(--teal-dim)}.stat.coral .num{color:var(--coral)}.stat.purple .num{color:var(--purple)}
 form.inline{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
-form.inline input{flex:1;min-width:140px;padding:10px 14px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;outline:none}
+form.inline input, form.inline select{flex:1;min-width:140px;padding:10px 14px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;outline:none}
 form.inline button{padding:10px 20px;border-radius:8px;border:none;background:var(--navy);color:white;font-size:14px;cursor:pointer;font-weight:600}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;animation:fadeUp 0.35s ease both}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
 .card h3{font-size:15px;font-weight:700;margin-bottom:5px}
 .card p.meta{font-size:13px;color:var(--text-muted);margin-bottom:10px}
-.card .id{font-size:10px;color:#c3c5d3;font-family:'JetBrains Mono',monospace;word-break:break-all}
+.card .id{font-size:10px;color:#c3c5d3;font-family:'JetBrains Mono',monospace;word-break:break-all;cursor:pointer}
+.card .actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.card .actions select{padding:6px 8px;border-radius:6px;border:1px solid var(--border);font-size:12px;flex:1}
+.card .actions button{padding:6px 12px;border-radius:6px;border:none;background:var(--navy);color:white;font-size:12px;cursor:pointer}
 .badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700}
 .badge.teal{background:var(--teal-glow);color:var(--teal-dim)}.badge.coral{background:var(--coral-glow);color:var(--coral)}.badge.purple{background:var(--purple-glow);color:var(--purple)}
 .section{display:none}.section.active{display:block}
 .empty{color:var(--text-muted);text-align:center;padding:48px 20px;font-size:14px}
 .spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:48px 20px;color:var(--text-muted);font-size:13px}
 .spinner{width:28px;height:28px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--teal);animation:spin 0.7s linear infinite}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .explore-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:20px}
 .explore-box .result-block{margin-top:18px}
 .explore-box .result-block h4{font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:10px;font-weight:700}
 .person-chip,.task-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;margin:3px 6px 3px 0}
 .person-chip{background:var(--teal-glow);color:var(--teal-dim)}.task-chip{background:var(--coral-glow);color:var(--coral)}
+.assign-panel{background:#F0FAF6;border:1px dashed var(--teal);border-radius:12px;padding:16px;margin-top:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:end}
 </style>
 </head>
 <body>
@@ -60,105 +63,34 @@ form.inline button{padding:10px 20px;border-radius:8px;border:none;background:va
 <a onclick="showSection('explore')" id="nav-explore">⟡ Explore graph</a>
 </aside>
 <main>
-<div class="section active" id="dashboard"><h2>Dashboard</h2><p class="subtitle">Overview of your team's knowledge graph</p><div id="dashboard-content"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div></div>
-<div class="section" id="people"><h2>People</h2><p class="subtitle">Team members and their roles</p><form class="inline" onsubmit="addPerson(event)"><input id="p-name" placeholder="Name" required><input id="p-role" placeholder="Role" required><input id="p-email" placeholder="Email" required><button type="submit">Add person</button></form><div id="people-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div></div>
-<div class="section" id="projects"><h2>Projects</h2><p class="subtitle">Active and past initiatives</p><form class="inline" onsubmit="addProject(event)"><input id="pr-name" placeholder="Name" required><input id="pr-desc" placeholder="Description" required><input id="pr-status" placeholder="Status" required><button type="submit">Add project</button></form><div id="projects-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div></div>
-<div class="section" id="tasks"><h2>Tasks</h2><p class="subtitle">Work items across all projects</p><form class="inline" onsubmit="addTask(event)"><input id="t-title" placeholder="Title" required><input id="t-status" placeholder="Status" required><input id="t-priority" placeholder="Priority" required><button type="submit">Add task</button></form><div id="tasks-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div></div>
-<div class="section" id="skills"><h2>Skills</h2><p class="subtitle">Capabilities across the team</p><form class="inline" onsubmit="addSkill(event)"><input id="s-name" placeholder="Skill name" required><button type="submit">Add skill</button></form><div id="skills-list" class="grid"><div class="spinner-wrap"><div class="spinner"></div>Loading</div></div></div>
-<div class="section" id="explore"><h2>Explore graph</h2><p class="subtitle">See who can help with a task</p><div class="explore-box"><form class="inline" style="margin-bottom:0" onsubmit="exploreTask(event)"><input id="ex-taskid" placeholder="Paste a Task ID" required><button type="submit">Explore</button></form><div id="explore-results"></div></div></div>
+<div class="section active" id="dashboard"><h2>Dashboard</h2><p class="subtitle">Overview</p><div id="dashboard-content"></div></div>
+<div class="section" id="people"><h2>People</h2><form class="inline" onsubmit="addPerson(event)"><input id="p-name" placeholder="Name" required><input id="p-role" placeholder="Role" required><input id="p-email" placeholder="Email" required><button type="submit">Add person</button></form><div id="people-list" class="grid"></div></div>
+<div class="section" id="projects"><h2>Projects</h2><form class="inline" onsubmit="addProject(event)"><input id="pr-name" placeholder="Name" required><input id="pr-desc" placeholder="Description" required><input id="pr-status" placeholder="Status" required><button type="submit">Add project</button></form><div id="projects-list" class="grid"></div></div>
+<div class="section" id="tasks"><h2>Tasks</h2><form class="inline" onsubmit="addTask(event)"><input id="t-title" placeholder="Title" required><input id="t-status" placeholder="Status" required><input id="t-priority" placeholder="Priority" required><button type="submit">Add task</button></form><div id="tasks-list" class="grid"></div></div>
+<div class="section" id="skills"><h2>Skills</h2><form class="inline" onsubmit="addSkill(event)"><input id="s-name" placeholder="Skill name" required><button type="submit">Add skill</button></form><div id="skills-list" class="grid"></div></div>
+<div class="section" id="explore"><h2>Explore graph</h2><p class="subtitle">See who can help - Now assign from UI</p><div class="explore-box"><form class="inline" style="margin-bottom:0" onsubmit="exploreTask(event)"><input id="ex-taskid" placeholder="Paste a Task ID" required><button type="submit">Explore</button></form><div id="explore-results"></div><div id="assign-area"></div></div></div>
 </main>
 </div>
 <script>
-const API='/api';
-function showSection(id){
-document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-document.querySelectorAll('aside a').forEach(a=>a.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-document.getElementById('nav-'+id).classList.add('active');
-if(id==='dashboard')loadDashboard();
-if(id==='people')loadPeople();
-if(id==='projects')loadProjects();
-if(id==='tasks')loadTasks();
-if(id==='skills')loadSkills();
-}
-async function loadDashboard(){
-const el=document.getElementById('dashboard-content');
-try{
-const [people,projects,tasks]=await Promise.all([fetch(API+'/persons/getAll').then(r=>r.json()),fetch(API+'/projects/getAllProject').then(r=>r.json()),fetch(API+'/task/getAllTasks').then(r=>r.json())]);
-el.innerHTML=`<div class="stat-row"><div class="stat teal"><div class="num">${people.length}</div><div class="label">People</div></div><div class="stat coral"><div class="num">${projects.length}</div><div class="label">Projects</div></div><div class="stat purple"><div class="num">${tasks.length}</div><div class="label">Tasks</div></div></div>`;
-}catch(e){el.innerHTML='<div class="empty">Could not reach backend. Refresh page.</div>';}
-}
-async function loadPeople(){
-const el=document.getElementById('people-list');
-el.innerHTML='<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
-try{
-const res=await fetch(API+'/persons/getAll');const data=await res.json();
-if(data.length===0){el.innerHTML='<div class="empty">No people yet.</div>';return;}
-el.innerHTML=data.map(p=>`<div class="card"><h3>${p.name}</h3><p class="meta">${p.role} · ${p.email}</p></div>`).join('');
-}catch(e){el.innerHTML='<div class="empty">Error loading people.</div>';}
-}
-async function addPerson(e){
-e.preventDefault();
-const body={name:document.getElementById('p-name').value,role:document.getElementById('p-role').value,email:document.getElementById('p-email').value};
-await fetch(API+'/persons/addPerson',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-e.target.reset();loadPeople();
-}
-async function loadProjects(){
-const el=document.getElementById('projects-list');
-el.innerHTML='<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
-try{
-const res=await fetch(API+'/projects/getAllProject');const data=await res.json();
-if(data.length===0){el.innerHTML='<div class="empty">No projects yet.</div>';return;}
-el.innerHTML=data.map(p=>`<div class="card"><h3>${p.name}</h3><p class="meta">${p.description||''}</p><span class="badge coral">${p.status||'Active'}</span></div>`).join('');
-}catch(e){el.innerHTML='<div class="empty">Error loading projects.</div>';}
-}
-async function addProject(e){
-e.preventDefault();
-const body={name:document.getElementById('pr-name').value,description:document.getElementById('pr-desc').value,status:document.getElementById('pr-status').value};
-await fetch(API+'/projects/addProject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-e.target.reset();loadProjects();
-}
-async function loadTasks(){
-const el=document.getElementById('tasks-list');
-el.innerHTML='<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
-try{
-const res=await fetch(API+'/task/getAllTasks');const data=await res.json();
-if(data.length===0){el.innerHTML='<div class="empty">No tasks yet.</div>';return;}
-el.innerHTML=data.map(t=>`<div class="card"><h3>${t.title}</h3><p class="meta">Priority: ${t.priority||'Normal'}</p><span class="badge purple">${t.status||'Open'}</span><div class="id" style="margin-top:10px">${t.id}</div></div>`).join('');
-}catch(e){el.innerHTML='<div class="empty">Error loading tasks.</div>';}
-}
-async function addTask(e){
-e.preventDefault();
-const body={title:document.getElementById('t-title').value,status:document.getElementById('t-status').value,priority:document.getElementById('t-priority').value};
-await fetch(API+'/task/addTask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-e.target.reset();loadTasks();
-}
-async function loadSkills(){
-const el=document.getElementById('skills-list');
-el.innerHTML='<div class="spinner-wrap"><div class="spinner"></div>Loading</div>';
-try{
-const res=await fetch(API+'/skill/getAll');const data=await res.json();
-if(data.length===0){el.innerHTML='<div class="empty">No skills yet.</div>';return;}
-el.innerHTML=data.map(s=>`<div class="card"><h3>${s.name}</h3><span class="badge teal">Skill</span></div>`).join('');
-}catch(e){el.innerHTML='<div class="empty">Error loading skills.</div>';}
-}
-async function addSkill(e){
-e.preventDefault();
-const body={name:document.getElementById('s-name').value};
-await fetch(API+'/skill/addSkill',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-e.target.reset();loadSkills();
-}
-async function exploreTask(e){
-e.preventDefault();
-const taskId=document.getElementById('ex-taskid').value;
-const el=document.getElementById('explore-results');
-el.innerHTML='<div class="spinner-wrap"><div class="spinner"></div>Searching</div>';
-try{
-const [helpers,blockers]=await Promise.all([fetch(API+'/task/whoCanHelp/'+taskId).then(r=>r.json()),fetch(API+'/task/blockers/'+taskId).then(r=>r.json())]);
-el.innerHTML=`<div class="result-block"><h4>Who can help</h4>${helpers.length?helpers.map(p=>`<span class="person-chip">${p.name} · ${p.role}</span>`).join(''):'<span class="empty">No one found</span>'}</div><div class="result-block"><h4>Blocked by</h4>${blockers.length?blockers.map(t=>`<span class="task-chip">${t.title}</span>`).join(''):'<span class="empty">No blockers</span>'}</div>`;
-}catch(e){el.innerHTML='<div class="empty">Error. Check Task ID.</div>';}
-}
-loadDashboard();
+const API='https://teamknowledgegraph-backend.onrender.com/api';
+let allPersons=[], allSkills=[], currentTaskId=null;
+function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('aside a').forEach(a=>a.classList.remove('active'));document.getElementById(id).classList.add('active');document.getElementById('nav-'+id).classList.add('active');if(id==='dashboard')loadDashboard();if(id==='people')loadPeople();if(id==='projects')loadProjects();if(id==='tasks')loadTasks();if(id==='skills')loadSkills();if(id==='explore')preload();}
+async function preload(){try{const [p,s]=await Promise.all([fetch(API+'/persons/getAllPersons').then(r=>r.json()), fetch(API+'/skill/getAllSkill').then(r=>r.json())]);allPersons=p; allSkills=s;}catch(e){}}
+async function loadDashboard(){const el=document.getElementById('dashboard-content');try{const [people,projects,tasks]=await Promise.all([fetch(API+'/persons/getAllPersons').then(r=>r.json()),fetch(API+'/projects/getAllProject').then(r=>r.json()),fetch(API+'/task/getAllTasks').then(r=>r.json())]);el.innerHTML=`<div class="stat-row"><div class="stat teal"><div class="num">${people.length}</div><div class="label">People</div></div><div class="stat coral"><div class="num">${projects.length}</div><div class="label">Projects</div></div><div class="stat purple"><div class="num">${tasks.length}</div><div class="label">Tasks</div></div></div>`;}catch(e){el.innerHTML='<div class="empty">Backend waking up... wait 30 sec and refresh.</div>';}}
+async function loadPeople(){const el=document.getElementById('people-list');el.innerHTML='Loading...';try{await preload();el.innerHTML=allPersons.map(p=>`<div class="card"><h3>${p.name}</h3><p class="meta">${p.role||''} · ${p.email||''}</p><div class="id" onclick="navigator.clipboard.writeText('${p.id}');alert('Copied')">${p.id}</div><div class="actions"><select id="skill-for-${p.id}"><option value="">Select skill</option>${allSkills.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select><button onclick="linkPersonSkill('${p.id}')">Add Skill</button></div></div>`).join('');}catch(e){el.innerHTML='Error';}}
+async function linkPersonSkill(personId){const skillId=document.getElementById('skill-for-'+personId).value;if(!skillId){alert('Select skill');return;}const res=await fetch(API+`/persons/addSkill/${personId}/${skillId}`,{method:'POST'});if(res.ok)alert('Skill added!');else alert('Failed');}
+async function addPerson(e){e.preventDefault();const body={name:document.getElementById('p-name').value,role:document.getElementById('p-role').value,email:document.getElementById('p-email').value};await fetch(API+'/persons/addPerson',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});e.target.reset();await preload();loadPeople();}
+async function loadProjects(){try{const res=await fetch(API+'/projects/getAllProject');const data=await res.json();document.getElementById('projects-list').innerHTML=data.map(p=>`<div class="card"><h3>${p.name}</h3><p class="meta">${p.description||''}</p><span class="badge coral">${p.status||'Active'}</span></div>`).join('');}catch(e){}}
+async function addProject(e){e.preventDefault();const body={name:document.getElementById('pr-name').value,description:document.getElementById('pr-desc').value,status:document.getElementById('pr-status').value};await fetch(API+'/projects/addProject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});e.target.reset();loadProjects();}
+async function loadTasks(){try{const res=await fetch(API+'/task/getAllTasks');const data=await res.json();document.getElementById('tasks-list').innerHTML=data.map(t=>`<div class="card"><h3>${t.title}</h3><p class="meta">Priority: ${t.priority||'Normal'}</p><span class="badge purple">${t.status||'Open'}</span><div class="id" onclick="document.getElementById('ex-taskid').value='${t.id}';showSection('explore');exploreTaskDirect('${t.id}')" style="margin-top:10px;background:#f0f0f0;padding:6px;border-radius:6px">ID: ${t.id} (click to explore)</div></div>`).join('');}catch(e){}}
+async function addTask(e){e.preventDefault();const body={title:document.getElementById('t-title').value,status:document.getElementById('t-status').value,priority:document.getElementById('t-priority').value};await fetch(API+'/task/addTask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});e.target.reset();loadTasks();}
+async function loadSkills(){try{await preload();document.getElementById('skills-list').innerHTML=allSkills.map(s=>`<div class="card"><h3>${s.name}</h3><div class="id">${s.id}</div><span class="badge teal">Skill</span></div>`).join('');}catch(e){}}
+async function addSkill(e){e.preventDefault();const body={name:document.getElementById('s-name').value};await fetch(API+'/skill/addSkill',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});e.target.reset();await preload();loadSkills();}
+async function exploreTaskDirect(taskId){currentTaskId=taskId;const el=document.getElementById('explore-results');const assignEl=document.getElementById('assign-area');el.innerHTML='Searching...';try{await preload();const [helpers,blockers]=await Promise.all([fetch(API+'/task/whoCanHelp/'+taskId).then(r=>r.json()),fetch(API+'/task/blockers/'+taskId).then(r=>r.json())]);el.innerHTML=`<div class="result-block"><h4>Who can help (${helpers.length})</h4>${helpers.length?helpers.map(p=>`<span class="person-chip">${p.name} · ${p.role||''}</span>`).join(''):'<span style="color:#767B94">No one found - assign below</span>'}</div><div class="result-block"><h4>Blocked by (${blockers.length})</h4>${blockers.length?blockers.map(t=>`<span class="task-chip">${t.title}</span>`).join(''):'No blockers'}</div>`;assignEl.innerHTML=`<div class="assign-panel"><div><label style="font-size:12px;font-weight:700">Assign Person Directly</label><br><select id="assign-person" style="padding:8px;border-radius:8px;border:1px solid #ddd;min-width:180px"><option value="">Select Person</option>${allPersons.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div><button onclick="assignPersonToTask()" style="padding:9px 16px;border-radius:8px;border:none;background:var(--navy);color:white;font-weight:600;cursor:pointer">Assign Person</button></div><div class="assign-panel"><div><label style="font-size:12px;font-weight:700">Add Skill to this Task</label><br><select id="assign-skill" style="padding:8px;border-radius:8px;border:1px solid #ddd;min-width:180px"><option value="">Select Skill</option>${allSkills.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><button onclick="assignSkillToTask()" style="padding:9px 16px;border-radius:8px;border:none;background:var(--teal);color:white;font-weight:600;cursor:pointer">Add Skill to Task</button></div>`;}catch(e){el.innerHTML='Error. Check Task ID.';}}
+function exploreTask(e){e.preventDefault();const taskId=document.getElementById('ex-taskid').value.trim();exploreTaskDirect(taskId);}
+async function assignPersonToTask(){const personId=document.getElementById('assign-person').value;if(!personId){alert('Select person');return;}const res=await fetch(API+`/persons/${personId}/assignTask/${currentTaskId}`,{method:'POST'});if(res.ok){alert('Assigned!');exploreTaskDirect(currentTaskId);}else alert('Failed');}
+async function assignSkillToTask(){const skillId=document.getElementById('assign-skill').value;if(!skillId){alert('Select skill');return;}const res=await fetch(API+`/task/addSkill/${currentTaskId}/${skillId}`,{method:'POST'});if(res.ok){alert('Skill added to task!');exploreTaskDirect(currentTaskId);}else alert('Failed');}
+loadDashboard();preload();
 </script>
 </body>
 </html>
