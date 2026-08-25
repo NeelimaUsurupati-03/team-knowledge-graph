@@ -14,8 +14,13 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         try {
-            String query = "UNWIND ['Java','Python','React','Angular','Node.js','Spring Boot','Docker','Kubernetes','AWS','SQL','MongoDB','JavaScript','TypeScript','HTML','CSS','Git','Jenkins','Microservices','REST API','GraphQL','Neo4j','MySQL','PostgreSQL','C++','C#','DevOps','Machine Learning','Data Structures','Algorithms','System Design'] AS skillName MERGE (s:Skill {name: skillName}) RETURN count(s)";
+            String query = "UNWIND ['Java','Python','React','Angular','Node.js','Spring Boot','Docker','Kubernetes','AWS','SQL','MongoDB','JavaScript','TypeScript','HTML','CSS','Git','Jenkins','Microservices','REST API','GraphQL','Neo4j','MySQL','PostgreSQL','C++','C#','DevOps','Machine Learning','Data Structures','Algorithms','System Design'] AS skillName MERGE (s:Skill {name: skillName}) ON CREATE SET s.id = randomUUID() RETURN count(s)";
             neo4jClient.query(query).run();
+
+            // Fix any Skill nodes left over from before the ID fix (created with a null id)
+            String fixNullIds = "MATCH (s:Skill) WHERE s.id IS NULL SET s.id = randomUUID() RETURN count(s)";
+            neo4jClient.query(fixNullIds).run();
+
             System.out.println("=== SEED SCRIPT EXECUTED SUCCESSFULLY ===");
         } catch (Exception e) {
             System.out.println("Seed skip: " + e.getMessage());
