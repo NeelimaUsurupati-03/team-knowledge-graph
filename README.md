@@ -1,6 +1,6 @@
 # Team Knowledge Graph
 
-A small full-stack application that models a team's people, projects, tasks, and skills as a **graph**, backed by CognoDB (a managed graph database speaking openCypher over Bolt). Built for the Wexa AI take-home assignment.
+A small full-stack application that models a team's people, projects, tasks, and skills as a graph, backed by CognoDB (a managed graph database speaking openCypher over Bolt). Built as an advanced engineering showcase to demonstrate graph data modeling, multi-hop relationship routing, and full-stack web architecture.
 
 **Live demo:** https://team-knowledge-graph.onrender.com
 *(First load may take 30–60s if the free-tier server has gone to sleep.)*
